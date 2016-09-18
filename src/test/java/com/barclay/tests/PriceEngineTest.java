@@ -1,6 +1,7 @@
 package com.barclay.tests;
 
-import com.barclay.tests.models.ProductDetail;
+import com.barclay.tests.exceptions.FieldsCountExeption;
+import com.barclay.tests.models.PriceDetail;
 import com.barclay.tests.models.ProductMarket;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,38 +29,60 @@ public class PriceEngineTest
 
 
     @Before
-    public void setup() {
+    public void setup() throws Exception {
         in = mock(InputStream.class);
         inr = mock(InputStreamReader.class);
         bufferedReader = mock(BufferedReader.class);
         priceEngine = new PriceEngine(bufferedReader);
+        PowerMockito.whenNew(InputStreamReader.class).withArguments(in).thenReturn(inr);
+        PowerMockito.whenNew(BufferedReader.class).withArguments(inr).thenReturn(bufferedReader);
 
     }
 
     @Test
     public void testGetProductMarket() throws Exception {
 
-            PowerMockito.whenNew(InputStreamReader.class).withArguments(in).thenReturn(inr);
-            PowerMockito.whenNew(BufferedReader.class).withArguments(inr).thenReturn(bufferedReader);
             PowerMockito.when(bufferedReader.readLine()).thenReturn("1").thenReturn("aaa H H\\n");
             Set<ProductMarket> ret = priceEngine.getProductSet();
             assertEquals(1, ret.size());
             ret.contains(new ProductMarket("aaa", "HH"));
 
+    }
 
+    @Test (expected = FieldsCountExeption.class)
+    public void testGetProductMarketFieldCountException() throws Exception {
+
+        PowerMockito.when(bufferedReader.readLine()).thenReturn("1").thenReturn("aaa H H L\\n");
+        Set<ProductMarket> ret = priceEngine.getProductSet();
     }
 
     @Test
     public void testGetProductDetails() throws Exception {
 
-        PowerMockito.whenNew(InputStreamReader.class).withArguments(in).thenReturn(inr);
-        PowerMockito.whenNew(BufferedReader.class).withArguments(inr).thenReturn(bufferedReader);
         PowerMockito.when(bufferedReader.readLine()).thenReturn("1").thenReturn("aaa X 1.0");
-        List<ProductDetail> list = priceEngine.getProductDetails();
+        List<PriceDetail> list = priceEngine.getPriceDetails();
         assertEquals(1, list.size());
         assertEquals(1.0, list.get(0).getPrice(), 0.0);
         assertEquals("X", list.get(0).getCompetitor());
         assertEquals("aaa", list.get(0).getCode());
+
+    }
+
+    @Test(expected = FieldsCountExeption.class)
+    public void testGetProductDetailsFieldsCountExeption() throws Exception {
+
+        PowerMockito.whenNew(BufferedReader.class).withArguments(inr).thenReturn(bufferedReader);
+        PowerMockito.when(bufferedReader.readLine()).thenReturn("1").thenReturn("aaa bbb X 1.0");
+        List<PriceDetail> list = priceEngine.getPriceDetails();
+
+
+    }
+
+    @Test(expected = NumberFormatException.class)
+    public void testGetProductDetailsNumberExeption() throws Exception {
+
+        PowerMockito.when(bufferedReader.readLine()).thenReturn("1").thenReturn("aaa bbb X ");
+        List<PriceDetail> list = priceEngine.getPriceDetails();
 
     }
 

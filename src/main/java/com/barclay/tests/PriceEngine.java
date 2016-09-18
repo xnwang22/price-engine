@@ -1,6 +1,8 @@
 package com.barclay.tests;
 
-import com.barclay.tests.models.ProductDetail;
+import com.barclay.tests.exceptions.FieldsCountExeption;
+import com.barclay.tests.exceptions.NoMatchMarketRuleExeption;
+import com.barclay.tests.models.PriceDetail;
 import com.barclay.tests.models.ProductMarket;
 import com.barclay.tests.services.PriceRuleService;
 import com.barclay.tests.services.PriceRuleServiceImpl;
@@ -14,7 +16,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Hello world!
+ * Price Engine application
  *
  */
 public class PriceEngine
@@ -42,20 +44,30 @@ public class PriceEngine
         } catch (IOException e) {
             e.printStackTrace();
         }
+        catch (FieldsCountExeption fieldsCountExeption) {
+            fieldsCountExeption.printStackTrace();
+        }
 
         // get ProductDetails
-        List<ProductDetail> productDetailList = null;
+        List<PriceDetail> priceDetailList = null;
         try {
-            productDetailList = priceEngine.getProductDetails();
+            priceDetailList = priceEngine.getPriceDetails();
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (FieldsCountExeption fieldsCountExeption) {
+            fieldsCountExeption.printStackTrace();
         }
 
         int i = 0;
         for(final ProductMarket productMarket : productMarketSet)
         {
-            double recommendedPrice = priceEngine.getPriceRuleService().getRecommendedPrice(productDetailList, productMarket);
-            double finalPrice = priceEngine.getPriceRuleService().applyMarketRule(productMarket.getMarket(), recommendedPrice);
+            double recommendedPrice = priceEngine.getPriceRuleService().getRecommendedPrice(priceDetailList, productMarket);
+            double finalPrice = 0;
+            try {
+                finalPrice = priceEngine.getPriceRuleService().applyMarketRule(productMarket.getMarket(), recommendedPrice);
+            } catch (NoMatchMarketRuleExeption noMatchMarketRuleExeption) {
+                noMatchMarketRuleExeption.printStackTrace();
+            }
             System.out.println(String.format("%s %.1f", (char)("A".charAt(0) + i), finalPrice));
             // **note** here only 52 products, since there are only 52 letters
             i++;
@@ -63,8 +75,8 @@ public class PriceEngine
 
     }
 
-
-     Set<ProductMarket> getProductSet() throws IOException {
+// make method package visible for unit test
+     Set<ProductMarket> getProductSet() throws IOException, FieldsCountExeption {
         Set<ProductMarket> productMarketSet = new HashSet<>(); // it is more appropriate to use set here
         System.out.println( "Please give product count:" );
         int productCount = Integer.parseInt(reader.readLine());
@@ -78,8 +90,7 @@ public class PriceEngine
             String input = reader.readLine();
             String[] fields = input.split(" ");
             if(fields.length != 3) {
-                System.out.println("Product has 3 fields");
-                return productMarketSet;
+                throw new FieldsCountExeption("Product Market details has " + fields.length + " fields.");
             }
 
             ProductMarket productMarket = new ProductMarket(fields[0], fields[1]+fields[2]);
@@ -88,15 +99,16 @@ public class PriceEngine
         return productMarketSet;
     }
 
-     List<ProductDetail> getProductDetails() throws IOException {
-        List<ProductDetail> productDetailList = new ArrayList<>();
-        System.out.println( "Please give product details count:" );
+    // make method package visible for unit test
+     List<PriceDetail> getPriceDetails() throws IOException, FieldsCountExeption {
+        List<PriceDetail> priceDetailList = new ArrayList<>();
+        System.out.println( "Please give price details count:" );
         int productDetailsCount = Integer.parseInt(reader.readLine());
 
         if(productDetailsCount < 1)
         {
             System.out.println("Number of product count has to be greater than 0");
-            return productDetailList;
+            return priceDetailList;
         }
 
         for( int i = 0; i < productDetailsCount; i++)
@@ -104,12 +116,11 @@ public class PriceEngine
             String input = reader.readLine();
             String[] fields = input.split(" ");
             if(fields.length != 3) {
-                System.out.println("Product details has 3 fields");
-                return productDetailList;
+               throw new FieldsCountExeption("Product price details has " + fields.length + " fields.");
             }
-            ProductDetail productDetail = new ProductDetail(fields[0], fields[1], Double.valueOf(fields[2]));
-            productDetailList.add(productDetail);
+            PriceDetail priceDetail = new PriceDetail(fields[0], fields[1], Double.valueOf(fields[2]));
+            priceDetailList.add(priceDetail);
         }
-        return productDetailList;
+        return priceDetailList;
     }
 }

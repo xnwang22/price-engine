@@ -1,17 +1,17 @@
 package com.barclay.tests.models;
 
 /**
- * Created by robinwang on 9/14/16.
+ * Created by robinwang on 9/17/16.
  * This model capture the input of
  * product code, competitor and their price
  */
 
-public class ProductDetail {
+public class PriceDetail {
     private String code;
     private String competitor;
     private double price;
 
-    public ProductDetail(String code, String competitor, double price) {
+    public PriceDetail(String code, String competitor, double price) {
         this.code = code;
         this.competitor = competitor;
         this.price = price;

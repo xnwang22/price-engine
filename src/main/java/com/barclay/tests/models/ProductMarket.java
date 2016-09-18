@@ -1,7 +1,7 @@
 package com.barclay.tests.models;
 
 /**
- * Created by robinwang on 9/14/16.
+ * Created by robinwang on 9/17/16.
  * This model capture the product name (code)
  * and the market. The market is represented by supply and demand concatenated
  * this model is more flexible than using enums in case of there are more market indicators or

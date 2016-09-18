@@ -1,5 +1,7 @@
 package com.barclay.tests.rules;
 
+import com.barclay.tests.exceptions.NoMatchMarketRuleExeption;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,23 +21,12 @@ public class MarketPriceRules {
         ruleMap.put("LH", increaseFivePercent);
         ruleMap.put("HL", decreaseFivePercent);
     }
-    public static double applyRule(String market, double price)
-    {
-        return ruleMap.get(market).operation(price);
+    public static double applyRule(String market, double price) throws NoMatchMarketRuleExeption {
+
+        MarketRule marketRule = ruleMap.get(market);
+        if(marketRule == null)
+            throw new NoMatchMarketRuleExeption("Cannot find matching rule for market supply and demand " + market);
+        return marketRule.operation(price);
     }
 }
-//public class MarketPriceRules {
-//    private static Map<String, Double> ruleMap;
-//
-//    static {
-//        ruleMap = new HashMap<>();
-//        ruleMap.put("HH", 1.0);
-//        ruleMap.put("LL", 1.10);
-//        ruleMap.put("LH", 1.05);
-//        ruleMap.put("HL", 0.95);
-//    }
-//    public static double applyRule(String market)
-//    {
-//        return ruleMap.get(market);
-//    }
-//}
+
