@@ -10,6 +10,7 @@ import java.util.Map;
  */
 public class MarketPriceRules {
     private static Map<String, MarketRule> ruleMap;
+    // use lambda function to capture rules. Will be easy to extend.
     static MarketRule noChange = (double a) -> {return a;};
     static MarketRule increaseTenPercent = (double a) -> a * 1.10;
     static MarketRule increaseFivePercent = (double a) -> a * 1.05;

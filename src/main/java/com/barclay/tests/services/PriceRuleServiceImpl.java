@@ -14,11 +14,11 @@ import java.util.stream.Stream;
 /**
  * Created by robinwang on 9/17/16.
  */
-public class PriceRuleServiceImpl implements PriceRuleService{
+public class PriceRuleServiceImpl implements PriceRuleService {
     @Override
     public double getRecommendedPrice(List<PriceDetail> priceDetailList, ProductMarket productMarket) {
         // 1) calculate average price for product
-        Supplier<Stream<PriceDetail>> streamSupplier = ()-> priceDetailList.stream().filter(e -> e.getCode().equals(productMarket.getName()));
+        Supplier<Stream<PriceDetail>> streamSupplier = () -> priceDetailList.stream().filter(e -> e.getCode().equals(productMarket.getName()));
         double averagePrice = streamSupplier.get().mapToDouble(value -> value.getPrice()).average().getAsDouble();
 
         // 2) filter out promotion price
@@ -33,9 +33,9 @@ public class PriceRuleServiceImpl implements PriceRuleService{
 
         // finally return the price with most occurrence, or the least of the most frequent occurrences
         return collect.entrySet().stream().max((o1, o2) -> {
-            if(o1.getValue() > o2.getValue())
+            if (o1.getValue() > o2.getValue())
                 return 1;
-            else if(o1.getValue() < o2.getValue())
+            else if (o1.getValue() < o2.getValue())
                 return -1;
             else {  // get frequency is the same, then get the least price
                 if (o1.getKey() > o2.getKey())

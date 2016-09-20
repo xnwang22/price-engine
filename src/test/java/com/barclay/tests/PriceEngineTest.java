@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -45,7 +46,7 @@ public class PriceEngineTest
             PowerMockito.when(bufferedReader.readLine()).thenReturn("1").thenReturn("aaa H H\\n");
             Set<ProductMarket> ret = priceEngine.getProductSet();
             assertEquals(1, ret.size());
-            ret.contains(new ProductMarket("aaa", "HH"));
+            assertTrue(ret.contains(new ProductMarket("aaa", "HH")));
 
     }
 
@@ -53,7 +54,7 @@ public class PriceEngineTest
     public void testGetProductMarketFieldCountException() throws Exception {
 
         PowerMockito.when(bufferedReader.readLine()).thenReturn("1").thenReturn("aaa H H L\\n");
-        Set<ProductMarket> ret = priceEngine.getProductSet();
+        priceEngine.getProductSet();
     }
 
     @Test
@@ -73,16 +74,14 @@ public class PriceEngineTest
 
         PowerMockito.whenNew(BufferedReader.class).withArguments(inr).thenReturn(bufferedReader);
         PowerMockito.when(bufferedReader.readLine()).thenReturn("1").thenReturn("aaa bbb X 1.0");
-        List<PriceDetail> list = priceEngine.getPriceDetails();
-
-
+        priceEngine.getPriceDetails();
     }
 
     @Test(expected = NumberFormatException.class)
     public void testGetProductDetailsNumberExeption() throws Exception {
 
         PowerMockito.when(bufferedReader.readLine()).thenReturn("1").thenReturn("aaa bbb X ");
-        List<PriceDetail> list = priceEngine.getPriceDetails();
+        priceEngine.getPriceDetails();
 
     }
 
